@@ -47,6 +47,7 @@ public class SchemaAnalyzer {
 
             for (Path sqlFile : sqlFiles) {
                 Path relative = repoPath.relativize(sqlFile);
+                err.println("--------------------------------------------------------------------------------");
                 out.println(relative);
                 if (relative.getNameCount() < 2) continue; // Skip files not in a subfolder
                 Path rootSubfolder = relative.subpath(0, 1);
@@ -65,12 +66,12 @@ public class SchemaAnalyzer {
                             out.println(sanitizedStmt);
                         }
 
-                        if (sanitizedStmt.toUpperCase().contains("CREATE EXTENSION")) continue; 
-                        if (sanitizedStmt.toUpperCase().startsWith("SET")) continue;
-                        if (sanitizedStmt.toUpperCase().contains("LOAD ")) continue;
-                        if (sanitizedStmt.toUpperCase().contains("ATTACH ")) continue;
-                        if (sanitizedStmt.toUpperCase().contains("DETACH ")) continue;
-                        if (sanitizedStmt.toUpperCase().contains("COPY ")) continue;
+                        // if (sanitizedStmt.toUpperCase().contains("CREATE EXTENSION")) continue; 
+                        // if (sanitizedStmt.toUpperCase().startsWith("SET")) continue;
+                        // if (sanitizedStmt.toUpperCase().contains("LOAD ")) continue;
+                        // if (sanitizedStmt.toUpperCase().contains("ATTACH ")) continue;
+                        // if (sanitizedStmt.toUpperCase().contains("DETACH ")) continue;
+                        // if (sanitizedStmt.toUpperCase().contains("COPY ")) continue;
 
                         Statement statement = CCJSqlParserUtil.parse(sanitizedStmt, parser -> parser
                             .withAllowComplexParsing(true)
@@ -99,20 +100,23 @@ public class SchemaAnalyzer {
                         // });
 
                     } catch (Exception e) {
+                        err.println(e.getClass());
+                        err.println(e.getMessage());
                         System.err.println("Error parsing: " + sanitizedStmt + " (" + e.getMessage() + ")");
+                        err.println("********************************************************************************");
                     }
                 }   
             }
         }
 
-        System.out.println("\nSchema counts per root subfolder:\n");
-        schemaMap.forEach((folder, schemas) ->
-            System.out.printf("%s,%d unique schemas\n", folder, schemas.size()));
+        // System.out.println("\nSchema counts per root subfolder:\n");
+        // schemaMap.forEach((folder, schemas) ->
+        //     System.out.printf("%s,%d unique schemas\n", folder, schemas.size()));
     }
 
     private static String sanitizeStatement(String stmt) {
         stmt = replacePlaceholders(stmt);
-        stmt = addIndexName(stmt);
+        // stmt = addIndexName(stmt);
         return stmt;
     }
 
